@@ -1,16 +1,3 @@
 # Folders from running pip install with 
 __pycache__
-bin
-boto3*
-botocore*
-certifi*
-charset_normalizer*
-dateutil*
-idna*
-jmespath*
-python_dateutil*
-requests*
-s3transfer*
-six*
-urllib3*
 deploy*

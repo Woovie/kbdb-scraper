@@ -1,12 +1,15 @@
-# Folders from running pip install with --target
+# Folders from running pip install with 
+__pycache__
 bin
-certifi-2022.5.18.1.dist-info
-certifi
-charset_normalizer-2.0.12.dist-info
-charset_normalizer
-idna-3.3.dist-info
-idna
-requests-2.27.1.dist-info
-requests
-urllib3-1.26.9.dist-info
-urllib3
+boto3*
+botocore*
+certifi*
+charset_normalizer*
+dateutil*
+idna*
+jmespath*
+python_dateutil*
+requests*
+s3transfer*
+six*
+urllib3*

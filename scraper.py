@@ -2,16 +2,18 @@
 KBDB Scraper
 """
 
+import logging
 import requests
 
 class Scrape:
     """
     Scraper base class
     """
-    def __init__(self, domain: str):
+    def __init__(self, domain: str, logger: logging.Logger):
         self.domain = domain
         self.results = None
         self.products = []
+        self.logger = logger
 
     def scrape(self):
         """

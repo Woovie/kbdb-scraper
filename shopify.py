@@ -1,6 +1,8 @@
 """
 Shopify Scraper class
 """
+# pylint: disable=logging-fstring-interpolation
+#   see: https://github.com/PyCQA/pylint/issues/3512
 
 import requests
 import stocks
@@ -21,17 +23,18 @@ class Shopify(Scrape):
     """
     def scrape(self) -> bool:
         """
-        Does a simple requests call to get 
+        Does a simple requests call to get products.json data for a vendor
         """
         products = []
         more_products = True
+        counter = 1
         while more_products:
-            result = requests.get(f"https://{self.domain}/products.json")# Returns 30 at a time
+            result = requests.get(f"https://{self.domain}/products.json?limit=250&page={counter}")
             json_response = result.json()
-            if len(json_response["products"]) > 0:
-                products.extend(json_response["products"])
-            else:
+            products.extend(json_response["products"])
+            if len(json_response["products"]) < 250:
                 more_products = False
+            counter += 1
 
         self.results = products
         return True
@@ -62,11 +65,11 @@ class Shopify(Scrape):
         any_true = any(variants_stock)
         result = None
         if all_true and any_true:
-            result = stocks.Stock.LIMITED
+            result = stocks.Stock.LIMITED.value
         elif all_true and not any_true:
-            result = stocks.Stock.YES
+            result = stocks.Stock.YES.value
         else:
-            result = stocks.Stock.NO
+            result = stocks.Stock.NO.value
         return result
 
     @staticmethod
@@ -75,7 +78,7 @@ class Shopify(Scrape):
         Returns a tuple of the min and max price of the variant
         """
         variants_price = list(map(lambda n: n["price"], product["variants"]))
-        return list(min(variants_price), max(variants_price))
+        return {"min": min(variants_price), "max": max(variants_price)}
 
     @staticmethod
     def name_transform(product: dict) -> str:
@@ -98,14 +101,14 @@ class Shopify(Scrape):
         Transforms each product
         """
         for product in self.results:
-            product = {}
-            product["url"] = self.url_transform(product)
-            product["stock"] = self.stock_transform(product)
-            product["price"] = self.price_transform(product)
-            product["name"] = self.name_transform(product)
+            new_product = {}
+            new_product["url"] = self.url_transform(product)
+            new_product["stock"] = self.stock_transform(product)
+            new_product["price"] = self.price_transform(product)
+            new_product["name"] = self.name_transform(product)
             # TODO quantity
-            product["category"] = self.category_transform(product)
-            self.products.append(product)
+            new_product["category"] = self.category_transform(product)
+            self.products.append(new_product)
         return True
 
     def compile(self):

@@ -5,6 +5,7 @@ Vendor Class
 #   see: https://github.com/PyCQA/pylint/issues/3512
 
 import logging
+import json
 from dataclasses import dataclass
 
 import boto3
@@ -15,9 +16,9 @@ class Vendor:
     """
     Vendor class
     """
-    def __init__(self, domain: str, logger: str = __name__):
+    def __init__(self, domain: str, logger: logging.Logger):
         self.domain = domain
-        self.logger = logging.getLogger(logger)
+        self.logger = logger
         self.client = boto3.client('dynamodb')
         try:
             result = self.client.get_item(
@@ -28,12 +29,13 @@ class Vendor:
                     }
                 }
             )
-            if len(result["Item"]) == 1:
+            if len(result["Item"]) == 4:
                 self.friendly_name = result["Item"]["friendly_name"]["S"]
                 self.region = result["Item"]["region"]["S"]
-                self.platform =  result["Item"]["platform"]["S"]
+                self.platform = int(result["Item"]["platform"]["N"])# what the fuck
             else:
-                raise ClientError
+                self.logger.exception(f"Unexpected results retreiving this vendor: {self.domain}")
+                self.logger.exception(f"Output: {json.dumps(result)}")
         except ClientError as error:
             self.logger.exception(f"Obtaining vendor data failed: {self.domain}")
             raise error

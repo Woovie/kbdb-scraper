@@ -1,20 +1,25 @@
 #!/bin/sh
 
+echo mkdir
 mkdir -v deploy &&
 
-cp -v *.py requirements.txt deploy &&
+echo cp
+cp -v *.py deploy &&
 
+echo cd
 cd deploy &&
 
-mv lambda_scrape.py lambda_function.py &&
-
-PYENV_VERSION=3.9.11
-
-pip install -r requirements.txt --upgrade --target . &&
-
-unset PYENV_VERSION
-
+echo gfind f
 gfind -type f -exec chmod -v 0644 {} \; &&
+
+echo gfind d
 gfind -type d -exec chmod -v 0755 {} \; &&
 
-tar -czvf ../deploy.tar.gz *
+echo zip
+zip -r ../deploy.zip *
+
+echo cd
+cd ..
+
+echo rm
+rm -rfv deploy/
